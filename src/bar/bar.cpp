@@ -1,5 +1,6 @@
 #include "bar.hpp"
 #include "../util/is_int.hpp"
+#include "../ipc/hyprland/ipc.hpp"
 #include <gtk/gtk.h>
 #include <gtk4-layer-shell.h>
 #include <string>
@@ -94,5 +95,9 @@ namespace widgets {
             gtk_window_set_default_size(this->gobj(), vertical ? value : 0, horizontal ? value : 0);
         }
         #undef ASSERT_INT
+
+        hyprland::Ipc i;
+        i.get_initial_workspaces();
+        
     }
 }

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(fltkshell LANGUAGES CXX)
+project(shell LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,8 +16,8 @@ pkg_check_modules(GTK4_LAYER_SHELL REQUIRED IMPORTED_TARGET gtk4-layer-shell-0)
 
 file(GLOB_RECURSE SOURCES src/*.cpp)
 
-add_executable(fltkshell ${SOURCES})
-target_link_libraries(fltkshell PRIVATE
+add_executable(shell ${SOURCES})
+target_link_libraries(shell PRIVATE
   PkgConfig::GTKMM4
   PkgConfig::GTK4_LAYER_SHELL
 )
