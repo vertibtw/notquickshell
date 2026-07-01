@@ -1,4 +1,4 @@
-binary := "fltkshell"
+binary := "shell"
 
 build:
     cmake -B build -DCMAKE_BUILD_TYPE=Release
