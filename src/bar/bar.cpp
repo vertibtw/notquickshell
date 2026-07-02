@@ -1,8 +1,15 @@
 #include "bar.hpp"
 #include "../util/is_int.hpp"
 #include "../ipc/hyprland/ipc.hpp"
+#include "../theme/theme.hpp"
+#include "workspaces.hpp"
+#include <glibmm/main.h>
 #include <gtk/gtk.h>
 #include <gtk4-layer-shell.h>
+#include <gtkmm/box.h>
+#include <gtkmm/centerbox.h>
+#include <gtkmm/object.h>
+#include <memory>
 #include <string>
 
 namespace widgets {
@@ -12,10 +19,48 @@ namespace widgets {
             return;
         }
         this->set_title("v.shell.bar");
-        this->set_default_size(200, 200);
+        this->set_default_size(67, 69);
         gtk_layer_init_for_window(this->gobj());
 
-        bool vertical, horizontal = false;
+        this->ipc = std::make_shared<hyprland::Ipc>();
+
+        gtk_layer_auto_exclusive_zone_enable(this->gobj());
+
+        /*
+        **********************************
+        *             CSS                *
+        ********************************** 
+        */
+
+        auto css = Gtk::CssProvider::create();
+
+        auto& c = theme::catppuccin_mocha;
+
+
+        std::string css_str =
+        ".workspace {"
+        "  min-width: 20px; max-width: 20px;"
+        "  min-height: 4px; max-height: 4px;"
+        "  border-radius: 2px;"
+        "  background: " + c.background_secondary + "; margin: 0 2px;"
+        "  transition: background 200ms ease, min-width 200ms ease, min-height 200ms ease;"
+        "}"
+        ".workspace.occupied { background: " + c.foreground_secondary + "; }"
+        ".workspace.active {"
+        "  min-width: 28px; max-width: 28px;"
+        "  min-height: 6px; max-height: 6px;"
+        "  border-radius: 3px;"
+        "  background: " + c.blue + ";"
+        "}";
+
+
+
+        css->load_from_data(css_str);
+
+        Gtk::StyleContext::add_provider_for_display(
+            get_display(), css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
+        );
+
 
         /*
         **********************************
@@ -33,25 +78,25 @@ namespace widgets {
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_RIGHT, true);
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_TOP, true);
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_BOTTOM, false);
-            horizontal = true;
+            this->horizontal = true;
         } else if ((*conf)["bar"]["position"] == "bottom") {
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_LEFT, true);
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_RIGHT, true);
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_TOP, false);
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_BOTTOM, true);
-            horizontal = true;
+            this->horizontal = true;
         } else if ((*conf)["bar"]["position"] == "left") {
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_LEFT, true);
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_RIGHT, false);
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_TOP, true);
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_BOTTOM, true);
-            vertical = true;
+            this->vertical = true;
         } else if ((*conf)["bar"]["position"] == "right") {
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_LEFT, false);
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_RIGHT, true);
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_TOP, true);
             gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_BOTTOM, true);
-            vertical = true;
+            this->vertical = true;
         }
         /*
         **********************************
@@ -80,7 +125,7 @@ namespace widgets {
         
         if ((*conf).contains("bar", "margin-bottom")) {
             ASSERT_INT((*conf)["bar"]["margin-bottom"]);
-            gtk_layer_set_margin(this->gobj(), GTK_LAYER_SHELL_EDGE_TOP, std::stoi((*conf)["bar"]["margin-bottom"]));
+            gtk_layer_set_margin(this->gobj(), GTK_LAYER_SHELL_EDGE_BOTTOM, std::stoi((*conf)["bar"]["margin-bottom"]));
         }
         
         /*
@@ -96,8 +141,46 @@ namespace widgets {
         }
         #undef ASSERT_INT
 
-        hyprland::Ipc i;
-        i.get_initial_workspaces();
-        
+    
+         /*
+        **********************************
+        *           MODULES              *
+        ********************************** 
+        */ 
+
+        auto main_box = Gtk::make_managed<Gtk::CenterBox>();
+        main_box->set_expand(true);
+        this->set_child(*main_box);
+
+        auto l_box = Gtk::make_managed<Gtk::Box>();
+        auto c_box = Gtk::make_managed<Gtk::Box>();
+        auto r_box = Gtk::make_managed<Gtk::Box>();
+
+        main_box->set_start_widget(*l_box);
+        main_box->set_center_widget(*c_box);
+        main_box->set_end_widget(*r_box);
+
+        auto mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(this->ipc);
+        c_box->append(*mod_workspaces);
+
+
+        // lambdas :<
+        ipc->on_event = [this, mod_workspaces] (std::string event, std::string arg) -> void {
+            Glib::signal_idle().connect_once([this, mod_workspaces, event, arg]()-> void{
+                
+                if (event == "workspace") {
+                    int ws_id = std::stoi(arg); // this has to be here and repeated, because some args are not numerical
+                    mod_workspaces->change_active_ws(ws_id);
+                  } else if (event == "createworkspace") {
+                    int ws_id = std::stoi(arg);
+                    mod_workspaces->create_ws(ws_id);
+                  } else if (event == "destroyworkspace") {
+                    int ws_id = std::stoi(arg);
+                    mod_workspaces->destroy_ws(ws_id);
+                  } else {
+                    std::cout << "ommited event: " << event << " >> " << arg << "\n";
+                  }
+            });
+        };
     }
 }

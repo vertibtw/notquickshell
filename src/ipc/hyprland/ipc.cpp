@@ -1,9 +1,12 @@
 #include "ipc.hpp"
+
 #include "../../util/extern/json.hpp"
 #include <cstring>
+#include <gtkmm/object.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <thread>
+#include <algorithm>
 #include <vector>
 
 namespace hyprland {
@@ -12,10 +15,6 @@ namespace hyprland {
         this->runtimedir = std::getenv("XDG_RUNTIME_DIR");
         // I wanted to use this-> instead of Ipc:: here but c++ is developed by stupid fucking people and we can't have nice things
         std::thread(&Ipc::socket2, this).detach();
-    }
-
-    void Ipc::dispatch(std::string event, std::string arg) {
-        std::cout << "[socket2] " << event << " : " << arg << std::endl; // placeholder
     }
 
     std::string Ipc::socket1 (std::string cmd) {
@@ -82,17 +81,18 @@ namespace hyprland {
                 if (pos == std::string::npos) continue;
                 std::string event = line.substr(0, pos);
                 std::string arg = line.substr(pos + 2);
-                this->dispatch(event, arg);
+                if (on_event) on_event(event, arg);
             }
         }
 
         // close (s); // nobody needs this anyway
     }
 
-    std::vector<Workspace> Ipc::get_initial_workspaces () {
+    std::vector<Workspace*> Ipc::get_initial_workspaces () {
         std::string raw_ws = socket1("j/workspaces");
         std::string raw_active_ws = socket1("j/activeworkspace");
-
+        
+        // TODO: check if the output is valid
         nlohmann::json j_ws   = nlohmann::json::parse(raw_ws);
         nlohmann::json j_a_ws = nlohmann::json::parse(raw_active_ws);
 
@@ -103,23 +103,55 @@ namespace hyprland {
             std::cerr << "WARN: ipc did not provide active workspace id\n"; // shouldn't happen probably
         }
 
-        // TODO: check if the output is good
+        std::vector<int> ws_ids;
         for (const auto& obj : j_ws) {
-            Workspace w;
             if (obj.contains("id")) {
-                w.id = obj["id"].get<int>();
-                std::cout << "workspace: " << w.id << "\n";
+                int id = obj["id"].get<int>();
+                if (id >= 0) ws_ids.push_back(id);
             } else {
-                std::cerr << "workspace doesn't have an id for some reason\n";
-                w.id = -67;
+                std::cerr << "warn: workspace doesn't contain id.\n";
             }
+        }
+        
+        std::sort(ws_ids.begin(), ws_ids.end());
 
-            if (w.id == active_ws_id) {
-                w.active = true;
-                std::cout << w.id << " is currently active!!\n";
+        std::vector<Workspace*> workspaces;
+
+        for (int i = 1; i <= 10; i++) {
+            auto ws = Gtk::make_managed<hyprland::Workspace>();
+            ws->id = i;
+            ws->add_css_class("workspace");
+            ws->add_css_class("empty");
+            workspaces.push_back(ws);
+        }
+
+        for (int id : ws_ids) {
+            if (id >= 1 && id <= 10) {
+                Workspace* ws = workspaces[id - 1];
+                ws->exists = true;
+                if (id == active_ws_id) { 
+                    ws->active = true;
+                    ws->add_css_class("active");
+                    ws->add_css_class("occupied");
+                } else {
+                    ws->add_css_class("occupied");
+                }
+            } else if (id > 10) { // workspace buttons with ids > 10 are separate
+                auto ws = Gtk::make_managed<hyprland::Workspace>();
+                ws->id = id;
+                ws->exists = true;
+                if (id == active_ws_id) {
+                    ws->active = true;
+                    ws->add_css_class("active");
+                    ws->add_css_class("occupied");
+                } else {
+                    ws->add_css_class("occupied");
+                }
+
+                workspaces.push_back(ws);
             }
         }
 
-        return {};
+        return workspaces;
     }
 }
