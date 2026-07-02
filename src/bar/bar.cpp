@@ -25,7 +25,11 @@ namespace widgets {
         auto& c = theme::catppuccin_mocha;
 
 
+        // okay maybe gonna have to move this to a .css file...
         std::string css_str =
+        ".bar {"
+        "  background: " + c.background_main + ";"
+        "}"
         ".workspace {"
         "  min-width: 20px; max-width: 20px;"
         "  min-height: 4px; max-height: 4px;"
@@ -38,7 +42,7 @@ namespace widgets {
         "  min-width: 28px; max-width: 28px;"
         "  min-height: 6px; max-height: 6px;"
         "  border-radius: 3px;"
-        "  background: " + c.blue + ";"
+        "  background: " + c.purple + ";"
         "}";
 
 
@@ -49,6 +53,8 @@ namespace widgets {
             get_display(), css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
         );
 
+
+        this->add_css_class("bar");
 
         /*
         **********************************
