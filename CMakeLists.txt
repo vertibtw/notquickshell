@@ -21,3 +21,5 @@ target_link_libraries(shell PRIVATE
   PkgConfig::GTKMM4
   PkgConfig::GTK4_LAYER_SHELL
 )
+
+install(TARGETS shell RUNTIME DESTINATION bin)

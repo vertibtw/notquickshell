@@ -22,47 +22,6 @@ namespace widgets {
         ********************************** 
         */
 
-        auto css = Gtk::CssProvider::create();
-
-        auto& c = theme::catppuccin_mocha;
-
-
-        // okay maybe gonna have to move this to a .css file...
-        std::string css_str =
-        ".bar {"
-        "  background: " + c.background_main + ";"
-        "}"
-        ".left-box {"
-        "  margin-left: 10px;"
-        "}"
-        ".right-box {"
-        "  margin-right: 10px;"
-        "}"
-        ".workspace {"
-        "  min-width: 20px;"
-        "  min-height: 4px;"
-        "  border-radius: 2px;"
-        "  background: " + c.background_secondary + "; margin: 0 2px;"
-        "  transition: background 200ms ease, min-width 200ms ease, min-height 200ms ease;"
-        "}"
-        ".workspace.occupied { background: " + c.foreground_secondary + "; }"
-        ".workspace.active {"
-        "  min-width: 28px;"
-        "  min-height: 6px;"
-        "  border-radius: 3px;"
-        "  background: " + c.purple + ";"
-        "}"
-        ".clock {"
-        "  color: " + c.foreground_main + ";"
-        "}";
-
-
-
-        css->load_from_data(css_str);
-
-        Gtk::StyleContext::add_provider_for_display(
-            get_display(), css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
-        );
 
 
         this->add_css_class("bar");

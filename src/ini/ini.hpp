@@ -10,7 +10,7 @@ class ini {
     private:
         std::unordered_map<std::string, std::unordered_map<std::string, std::string>> conf;
         std::vector<std::string> section_keys = {
-            "main", "bar"
+            "", "bar"
         };
     public:
         static ini parse (std::string);

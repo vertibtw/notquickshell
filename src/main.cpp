@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <memory>
@@ -6,12 +7,26 @@
 
 #include "ini/ini.hpp"
 #include "bar/bar.hpp"
+#include "theme/theme.hpp"
 
 int main (int argc, char** argv) {
     std::stringstream ss;
-    std::ifstream f ("example.ini");
+
+    std::string home_dir   = std::getenv("HOME");
+
+    if (home_dir.empty()) {
+        std::cerr << "ERROR: $HOME environment variable not set.\n";
+        std::exit(1);
+    }
+
+    std::string config_path;
+
+    config_path = home_dir + "/.shell.ini"; // I don't wanna do configs in .config
+
+    std::ifstream f (config_path);
+
     if (!f.is_open()) {
-        std::cout << "ERROR: couldn't open config file\n";
+        std::cout << "ERROR: couldn't open config file '" << config_path << "'\n";
         return EXIT_FAILURE;
     }
     ss << f.rdbuf();
@@ -19,16 +34,65 @@ int main (int argc, char** argv) {
     std::string content = ss.str();
     std::shared_ptr<ini> conf = std::make_shared<ini>(ini::parse(content));
 
+    auto css = Gtk::CssProvider::create();
+
+    std::string css_str =
+    ".bar {"
+    "  background: var(--background_main);"
+    "}"
+    ".left-box {"
+    "  margin-left: 10px;"
+    "}"
+    ".right-box {"
+    "  margin-right: 10px;"
+    "}"
+    ".workspace {"
+    "  min-width: 20px;"
+    "  min-height: 4px;"
+    "  border-radius: 2px;"
+    "  background: var(--background_secondary); margin: 0 2px;"
+    "  transition: background 200ms ease, min-width 200ms ease, min-height 200ms ease;"
+    "}"
+    ".workspace.occupied { background: var(--foreground_secondary); }"
+    ".workspace.active {"
+    "  min-width: 28px;"
+    "  min-height: 6px;"
+    "  border-radius: 3px;"
+    "  background: var(--purple);"
+    "}"
+    ".clock {"
+    "  color: var(--foreground_main);"
+    "}";
+
+
+    if (conf->contains("", "theme")) {
+        if ((*conf)[""]["theme"] == "catppuccin mocha") css_str.insert(0, theme::catppuccin_mocha);
+        else if ((*conf)[""]["theme"] == "catppuccin frappe") css_str.insert(0, theme::catppuccin_frappe);
+        else if ((*conf)[""]["theme"] == "catppuccin latte") css_str.insert(0, theme::catppuccin_latte);
+        else if ((*conf)[""]["theme"] == "catppuccin macchiato") css_str.insert(0, theme::catppuccin_macchiato);
+        else {
+            std::cerr << "ERROR: invalid theme name: '" << (*conf)[""]["theme"] << "'; using catppuccin mocha.\n";
+            css_str.insert(0, theme::catppuccin_macchiato);
+        }
+    } else {
+        std::cerr << "WARN: no theme provided, using catppuccin mocha.\n";
+        css_str.insert(0, theme::catppuccin_macchiato);
+    }
+
     auto app = Gtk::Application::create("v.shell.app");
 
     auto bar = Gtk::make_managed<widgets::Bar>(conf);
 
+    app->signal_startup().connect([&]() -> void {
+        css->load_from_data(css_str);
+        Gtk::StyleContext::add_provider_for_display(
+            Gdk::Display::get_default(), css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
+        );
+        app->add_window(*bar);
+    });
+
     app->signal_activate().connect([&]() -> void {
         bar->present();
-    });
-    
-    app->signal_startup().connect([&]() -> void {
-        app->add_window(*bar);
     });
 
     return app->run(argc, argv);
