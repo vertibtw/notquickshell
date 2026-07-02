@@ -1,4 +1,6 @@
 #include "bar.hpp"
+#include "clock.hpp"
+#include <gtkmm/object.h>
 
 namespace widgets {
     Bar::Bar (std::shared_ptr<ini> conf) {
@@ -30,19 +32,28 @@ namespace widgets {
         ".bar {"
         "  background: " + c.background_main + ";"
         "}"
+        ".left-box {"
+        "  margin-left: 10px;"
+        "}"
+        ".right-box {"
+        "  margin-right: 10px;"
+        "}"
         ".workspace {"
-        "  min-width: 20px; max-width: 20px;"
-        "  min-height: 4px; max-height: 4px;"
+        "  min-width: 20px;"
+        "  min-height: 4px;"
         "  border-radius: 2px;"
         "  background: " + c.background_secondary + "; margin: 0 2px;"
         "  transition: background 200ms ease, min-width 200ms ease, min-height 200ms ease;"
         "}"
         ".workspace.occupied { background: " + c.foreground_secondary + "; }"
         ".workspace.active {"
-        "  min-width: 28px; max-width: 28px;"
-        "  min-height: 6px; max-height: 6px;"
+        "  min-width: 28px;"
+        "  min-height: 6px;"
         "  border-radius: 3px;"
         "  background: " + c.purple + ";"
+        "}"
+        ".clock {"
+        "  color: " + c.foreground_main + ";"
         "}";
 
 
@@ -150,12 +161,20 @@ namespace widgets {
         auto c_box = Gtk::make_managed<Gtk::Box>();
         auto r_box = Gtk::make_managed<Gtk::Box>();
 
+        l_box->add_css_class("left-box");
+        c_box->add_css_class("center-box");
+        r_box->add_css_class("right-box");
+
         main_box->set_start_widget(*l_box);
         main_box->set_center_widget(*c_box);
         main_box->set_end_widget(*r_box);
 
         auto mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(this->ipc);
+        auto mod_clock = Gtk::make_managed<bar::modules::Clock>();        
+
+
         c_box->append(*mod_workspaces);
+        r_box->append(*mod_clock);
 
 
         // lambdas :<
