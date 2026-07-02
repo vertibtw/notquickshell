@@ -14,7 +14,7 @@
       packages = forAllSystems (system:
         let pkgs = pkgsFor system; in {
           default = pkgs.stdenv.mkDerivation {
-            pname = "shell";
+            pname = "notquickshell";
             version = "0.0.1";
             src = ./.;
             nativeBuildInputs = with pkgs; [ cmake pkg-config ];
@@ -36,9 +36,9 @@
 
       homeManagerModules.default = { config, pkgs, lib, ... }:
         let
-          cfg = config.programs.shell;
+          cfg = config.programs.notquickshell;
         in {
-          options.programs.shell = {
+          options.programs.notquickshell = {
             enable = lib.mkEnableOption "gtk4 desktop shell";
             package = lib.mkOption {
               type = lib.types.package;
