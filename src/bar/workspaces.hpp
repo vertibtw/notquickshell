@@ -1,11 +1,14 @@
 #pragma once
 
+#include "../ipc/hyprland/ipc.hpp"
 #include <gtkmm/box.h>
+#include <gtkmm/enums.h>
+#include <gtkmm/label.h>
+#include <gtkmm/object.h>
 #include <memory>
+#include <string>
 #include <vector>
 #include "workspace.hpp"
-
-namespace hyprland { class Ipc; } // compiler complained about circular inclusion fuck c++
 
 namespace bar {
     namespace modules {

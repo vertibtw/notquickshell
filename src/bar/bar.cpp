@@ -1,16 +1,4 @@
 #include "bar.hpp"
-#include "../util/is_int.hpp"
-#include "../ipc/hyprland/ipc.hpp"
-#include "../theme/theme.hpp"
-#include "workspaces.hpp"
-#include <glibmm/main.h>
-#include <gtk/gtk.h>
-#include <gtk4-layer-shell.h>
-#include <gtkmm/box.h>
-#include <gtkmm/centerbox.h>
-#include <gtkmm/object.h>
-#include <memory>
-#include <string>
 
 namespace widgets {
     Bar::Bar (std::shared_ptr<ini> conf) {

@@ -1,14 +1,5 @@
 #include "ipc.hpp"
 
-#include "../../util/extern/json.hpp"
-#include <cstring>
-#include <gtkmm/object.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <thread>
-#include <algorithm>
-#include <vector>
-
 namespace hyprland {
     Ipc::Ipc () {
         this->his        = std::getenv("HYPRLAND_INSTANCE_SIGNATURE");

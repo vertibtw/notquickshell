@@ -1,5 +1,4 @@
 #include "is_int.hpp"
-#include <cctype>
 
 namespace util {
     bool is_number(std::string value) {

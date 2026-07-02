@@ -1,10 +1,19 @@
 #pragma once
+#include <glibmm/main.h>
+#include <gtk/gtk.h>
 #include <gtkmm.h>
 #include <gtk4-layer-shell/gtk4-layer-shell.h>
+#include <gtkmm/box.h>
+#include <gtkmm/centerbox.h>
+#include <gtkmm/object.h>
 #include <memory>
+#include <string>
 
 #include "../ini/ini.hpp"
 #include "../ipc/hyprland/ipc.hpp"
+#include "../theme/theme.hpp"
+#include "../util/is_int.hpp"
+#include "workspaces.hpp"
 
 namespace widgets {
 

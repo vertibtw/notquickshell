@@ -1,15 +1,20 @@
 #pragma once
 // #include "../../bar/bar.hpp"
-#include "../../bar/workspaces.hpp"
+#include "../../bar/workspace.hpp"
+#include "../../util/extern/json.hpp"
 
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
+#include <gtkmm/object.h>
 #include <iostream>
 #include <memory>
-#include <vector>
 #include <string>
-#include <cstdlib>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <thread>
 #include <unistd.h>
+#include <vector>
 
 namespace hyprland {
     class Ipc {

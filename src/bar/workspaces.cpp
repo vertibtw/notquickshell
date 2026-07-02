@@ -1,10 +1,4 @@
 #include "workspaces.hpp"
-#include "../ipc/hyprland/ipc.hpp"
-#include <gtkmm/enums.h>
-#include <gtkmm/label.h>
-#include <gtkmm/object.h>
-#include <memory>
-#include <string>
 
 void bar::modules::Workspaces::change_active_ws (int ws_id) {
     for (auto workspace : this->workspaces) {
