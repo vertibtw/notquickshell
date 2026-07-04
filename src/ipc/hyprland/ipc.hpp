@@ -21,7 +21,6 @@ namespace hyprland {
         private:
         std::string his = "";
         std::string runtimedir = "";
-        // std::shared_ptr<widgets::Bar> bar;
 
         public:
         std::function<void(std::string, std::string)> on_event; // my greatest idea yet I feel so c++

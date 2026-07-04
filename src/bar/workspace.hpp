@@ -2,10 +2,28 @@
 #include <gtkmm.h>
 
 namespace hyprland {
-    struct Workspace : public Gtk::Box {
+    class Workspace : public Gtk::Box {
+        public:
         int id = -1;
         bool active = false;
         bool exists = false; 
-        bool irregular = false;
+        
+        Workspace () {
+            auto click = Gtk::GestureClick::create();
+            auto motion = Gtk::EventControllerMotion::create();
+            click->signal_pressed().connect([&] (int, double, double){
+                system(("hyprctl dispatch 'hl.dsp.focus({ workspace = " + std::to_string(this->id) + " })'").c_str()); // TODO: use the socket1 function thingy
+            });
+
+            motion->signal_enter().connect([this](double x, double y) {
+                if (!this->active) this->add_css_class("active");
+            });
+            motion->signal_leave().connect([this]() {
+                if (!this->active) this->remove_css_class("active");
+            });
+
+            this->add_controller(motion);
+            this->add_controller(click);
+        }
     };
 }

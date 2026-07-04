@@ -1,6 +1,5 @@
 #include "bar.hpp"
 #include "clock.hpp"
-#include <gtkmm/object.h>
 
 namespace widgets {
     Bar::Bar (std::shared_ptr<ini> conf) {
