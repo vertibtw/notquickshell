@@ -5,7 +5,7 @@
 namespace widgets {
     Bar::Bar (std::shared_ptr<ini> conf) {
         if (!(*conf).contains("bar")) {
-            std::cerr << "ERROR: config does not contain a bar section, bar cannot be created.\n";
+            std::cerr << "ERROR: config does not contain a bar section, bar will not be created.\n";
             return;
         }
         this->set_title("v.shell.bar");
@@ -21,8 +21,6 @@ namespace widgets {
         *             CSS                *
         ********************************** 
         */
-
-
 
         this->add_css_class("bar");
 
@@ -119,6 +117,13 @@ namespace widgets {
         auto l_box = Gtk::make_managed<Gtk::Box>();
         auto c_box = Gtk::make_managed<Gtk::Box>();
         auto r_box = Gtk::make_managed<Gtk::Box>();
+        
+        if ((*conf).contains("bar", "spacing")) {
+            int spacing = std::stoi((*conf)["bar"]["spacing"]);
+            l_box->set_spacing(spacing);
+            c_box->set_spacing(spacing);
+            r_box->set_spacing(spacing);
+        }
 
         l_box->add_css_class("left-box");
         c_box->add_css_class("center-box");
@@ -150,7 +155,7 @@ namespace widgets {
                     int ws_id = std::stoi(arg);
                     mod_workspaces->destroy_ws(ws_id);
                   } else {
-                    std::cout << "ommited event: " << event << " >> " << arg << "\n";
+                    // std::cout << "ommited event: " << event << " >> " << arg << "\n";
                   }
             });
         };

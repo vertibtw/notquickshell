@@ -76,15 +76,16 @@ ini ini::parse (std::string content) {
 
                 NEXT(i, bs, errormsg);
 
-                while (i < bs) {
+                while (i < bs && buffer[i] != '#') {
                     value += buffer[i++];
                 }
                 value = trim(value);
-                std::cout << "[" << section << "] '" << key << "' = " << value << "\n";
+                std::cout << "[" << section << "] '" << key << "' = '" << value << "'\n";
 
                 r.conf[section][key] = value;
                 key.clear();
-
+                
+                break;
             } else {
 
                 std::cerr << "ERROR: unexpected EOF, on line " << line_count << "\n";

@@ -89,11 +89,11 @@ int main (int argc, char** argv) {
             Gdk::Display::get_default(), css, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
         );
         app->add_window(*bar);
+        app->signal_activate().connect([&]() -> void {
+            bar->present();
+        });
     });
 
-    app->signal_activate().connect([&]() -> void {
-        bar->present();
-    });
 
     return app->run(argc, argv);
 }
