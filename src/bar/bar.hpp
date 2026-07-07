@@ -13,7 +13,10 @@
 #include "../ipc/hyprland/ipc.hpp"
 #include "../theme/theme.hpp"
 #include "../util/is_int.hpp"
+#include "clock.hpp"
 #include "workspaces.hpp"
+#include "volume/volume_button.hpp"
+#include "volume/volume_window.hpp"
 
 namespace widgets {
 

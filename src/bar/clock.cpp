@@ -6,7 +6,7 @@ namespace bar {
         bool Clock::update() {
                 auto now = std::time(nullptr);
                 auto* lt = std::localtime(&now);
-                std::string s = std::format("{:02d} {:02d}", lt->tm_hour, lt->tm_min);
+                std::string s = std::format("{:02d}:{:02d}", lt->tm_hour, lt->tm_min);
                 this->l->set_text(s);
                 return true;
         }

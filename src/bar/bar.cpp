@@ -1,5 +1,5 @@
 #include "bar.hpp"
-#include "clock.hpp"
+#include <gtkmm/object.h>
 
 namespace widgets {
     Bar::Bar (std::shared_ptr<ini> conf) {
@@ -124,6 +124,10 @@ namespace widgets {
             r_box->set_spacing(spacing);
         }
 
+        // popups
+        auto vol_window = Gtk::make_managed<VolumeWindow>();
+        
+        // actual bar layout
         l_box->add_css_class("left-box");
         c_box->add_css_class("center-box");
         r_box->add_css_class("right-box");
@@ -134,16 +138,16 @@ namespace widgets {
 
         auto mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(this->ipc);
         auto mod_clock = Gtk::make_managed<bar::modules::Clock>();        
+        auto mod_vol_btn = Gtk::make_managed<VolumeButton>(vol_window);
 
 
         c_box->append(*mod_workspaces);
         r_box->append(*mod_clock);
-
+        r_box->append(*mod_vol_btn);
 
         // lambdas :<
         ipc->on_event = [this, mod_workspaces] (std::string event, std::string arg) -> void {
-            Glib::signal_idle().connect_once([this, mod_workspaces, event, arg]()-> void{
-                
+            Glib::signal_idle().connect_once([this, mod_workspaces, event, arg]()-> void {
                 if (event == "workspace") {
                     int ws_id = std::stoi(arg); // this has to be here and repeated, because some args are not numerical
                     mod_workspaces->change_active_ws(ws_id);

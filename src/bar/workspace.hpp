@@ -1,4 +1,5 @@
 #pragma once
+#include <glibmm.h>
 #include <gtkmm.h>
 
 namespace hyprland {
@@ -12,7 +13,7 @@ namespace hyprland {
             auto click = Gtk::GestureClick::create();
             auto motion = Gtk::EventControllerMotion::create();
             click->signal_pressed().connect([&] (int, double, double){
-                system(("hyprctl dispatch 'hl.dsp.focus({ workspace = " + std::to_string(this->id) + " })'").c_str()); // TODO: use the socket1 function thingy
+                    Glib::spawn_command_line_sync(("hyprctl dispatch 'hl.dsp.focus({ workspace = " + std::to_string(this->id) + " })'")); // TODO: use the socket1 function thingy
             });
 
             motion->signal_enter().connect([this](double x, double y) {
