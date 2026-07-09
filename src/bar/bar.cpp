@@ -125,7 +125,7 @@ namespace widgets {
         }
 
         // popups
-        auto vol_window = Gtk::make_managed<VolumeWindow>();
+        auto popover = Gtk::make_managed<bar::modules::VolumeWindow>();
         
         // actual bar layout
         l_box->add_css_class("left-box");
@@ -138,7 +138,7 @@ namespace widgets {
 
         auto mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(this->ipc);
         auto mod_clock = Gtk::make_managed<bar::modules::Clock>();        
-        auto mod_vol_btn = Gtk::make_managed<VolumeButton>(vol_window);
+        auto mod_vol_btn = Gtk::make_managed<bar::modules::VolumeButton>(popover);
 
 
         c_box->append(*mod_workspaces);

@@ -1,79 +1,74 @@
 #include "volume_window.hpp"
-// TODO: fix volume muting on first open for some reason
-// I will not be fixing this probably
+#include "../wireplumber.hpp"
+namespace bar::modules {
 
-bool VolumeWindow::poll_vol () {
-    int current = get_vol();
+VolumeWindow::VolumeWindow() {
+    // TODO: don't accentally forget that this is always supposed to be horizontal when u finally get to the part where you make the vertical bar work
+    auto vbox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 4);
+    vbox->set_margin(4);
 
-    if (current != this->VOLUME) {
-        this->VOLUME = current;
-        this->s->set_value(current);
-    }
+    slider = Gtk::make_managed<Gtk::Scale>(Gtk::Adjustment::create(50.0, 0.0, 100.0, 1.0, 10.0, 0.0));
+    slider->set_digits(0);
+    slider->set_draw_value(false);
+    slider->set_size_request(140, -1);
 
+    mute_btn = Gtk::make_managed<Gtk::ToggleButton>("Mute");
+    
+    vbox->append(*slider);
+    vbox->append(*mute_btn);
+    set_child(*vbox);
+
+    slider->signal_value_changed().connect([this]() {
+        if (!updating) {
+            wp::wpctl_set_volume(slider->get_value());
+            this->change_button_label(this->mute_btn, slider->get_value());
+        }
+    });
+
+    mute_btn->signal_toggled().connect([this]() {
+        if (!updating) {
+            wp::wpctl_set_muted(mute_btn->get_active());
+            this->change_button_label(this->mute_btn, slider->get_value());
+        }
+    });
+
+    signal_show().connect([this]() {
+        if (!poll_conn.connected()) {
+            poll_conn = Glib::signal_timeout().connect(
+                sigc::mem_fun(*this, &VolumeWindow::poll), 500);
+        }
+        // initial poll
+        Glib::signal_idle().connect_once([this]() { poll(); });
+    });
+
+    signal_hide().connect([this]() {
+        poll_conn.disconnect();
+    });
+
+    this->add_css_class("volume_window");
+}
+
+bool VolumeWindow::poll() {
+    this->updating = true;
+    slider->set_value(wp::wpctl_get_volume() * 100.0);
+    mute_btn->set_active(wp::wpctl_get_muted());
+    updating = false;
     return true;
 }
 
-void VolumeWindow::watch_vol () {
-    poll_vol(); // no delay speed speed vroom vroom
-
-    this->poll_conn = Glib::signal_timeout().connect(
-        sigc::mem_fun(*this, &VolumeWindow::poll_vol),
-        500 
-    );
+double VolumeWindow::get_volume() const {
+    return slider->get_value();
 }
 
-int VolumeWindow::get_vol () {
-    std::string output;
-    try {
-        Glib::spawn_command_line_sync("wpctl get-volume @DEFAULT_AUDIO_SINK@", &output);
-    } catch (const Glib::Error& e) {
-        return -1;
-    }
-
-    std::smatch m;
-    if (std::regex_search(output, m, std::regex(R"(Volume:\s*([\d.]+))"))) {
-        double fraction = std::stod(m[1]);
-        return static_cast<int>(std::round(fraction * 100));
-    }
-
-    return -1;
+bool VolumeWindow::get_muted() const {
+    return mute_btn->get_active();
 }
 
-bool VolumeWindow::is_muted() {
-    std::string output;
-    try {
-        Glib::spawn_command_line_sync("wpctl get-volume @DEFAULT_AUDIO_SINK@", &output);
-    } catch (const Glib::Error& e) {
-        return false;
-    }
-
-    return output.find("MUTED") != std::string::npos;
+void VolumeWindow::change_button_label (Gtk::ToggleButton* btn, double volume) {
+    if      (volume <= 0)   btn->set_label("muted"); 
+    else if (volume <= 33)  btn->set_label("small sound");
+    else if (volume <= 66)  btn->set_label("medium sound");
+    else if (volume <= 100) btn->set_label("big sound");
 }
 
-VolumeWindow::VolumeWindow () {
-    // TODO: orientation based on bar position (this is todo like everywhere but whatever)
-    auto scale = Gtk::make_managed <Gtk::Scale>(Gtk::Orientation::HORIZONTAL);
-    scale->set_range(0.0, 100.0);
-    scale->set_value(1);
-    scale->set_digits(0);
-    scale->set_draw_value(false);
-    scale->set_digits(0);
-    scale->set_round_digits(0);
-    scale->set_increments(1.0, 10.0);
-
-    scale->signal_value_changed().connect([scale]() {
-        int val = static_cast<int>(std::round(scale->get_value()));
-        std::string cmd = "wpctl set-volume @DEFAULT_AUDIO_SINK@ " + std::to_string(val) + "%";
-        Glib::spawn_command_line_async(cmd);
-    });
-
-    this->s = scale;
-    this->set_child(*scale);
-    this->add_css_class("volume_window");
-
-
-    this->signal_show().connect(sigc::mem_fun(*this, &VolumeWindow::watch_vol));
-    this->signal_hide().connect([this]() {
-        this->poll_conn.disconnect();
-    });
 }

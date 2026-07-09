@@ -18,7 +18,7 @@
             version = "0.0.1";
             src = ./.;
             nativeBuildInputs = with pkgs; [ cmake pkg-config ];
-            buildInputs = with pkgs; [ gtkmm4 gtk4-layer-shell ];
+            buildInputs = with pkgs; [ gtkmm4 gtk4-layer-shell wireplumber ];
           };
         }
       );
@@ -26,7 +26,7 @@
       devShells = forAllSystems (system:
         let pkgs = pkgsFor system; in {
           default = pkgs.mkShell {
-            buildInputs = with pkgs; [ gcc cmake just pkg-config gtkmm4 gtk4-layer-shell ];
+            buildInputs = with pkgs; [ gcc cmake just pkg-config gtkmm4 gtk4-layer-shell wireplumber ];
             shellHook = ''
               exec fish
             '';

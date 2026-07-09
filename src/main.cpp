@@ -97,6 +97,14 @@ int main (int argc, char** argv) {
     "  background: var(--foreground_main);"
     "  border-radius: 0;"
     "  border: none;"
+    "}"
+    ".volume_button label {"
+    "  color: var(--foreground_main);"
+    "}"
+    ".volume_button arrow {" // idk it would not disable itself despite the set_always_show_arrow(false), gtk ig
+    "  min-width: 0;"
+    "  min-height: 0;"
+    "  opacity: 0;"
     "}";
 
 

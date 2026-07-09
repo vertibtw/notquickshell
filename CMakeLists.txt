@@ -13,6 +13,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTKMM4 REQUIRED IMPORTED_TARGET gtkmm-4.0)
 pkg_check_modules(GTK4_LAYER_SHELL REQUIRED IMPORTED_TARGET gtk4-layer-shell-0)
+pkg_check_modules(WIREPLUMBER REQUIRED IMPORTED_TARGET wireplumber-0.5)
 
 file(GLOB_RECURSE SOURCES src/*.cpp)
 
@@ -20,6 +21,7 @@ add_executable(shell ${SOURCES})
 target_link_libraries(shell PRIVATE
   PkgConfig::GTKMM4
   PkgConfig::GTK4_LAYER_SHELL
+  PkgConfig::WIREPLUMBER
 )
 
 install(TARGETS shell RUNTIME DESTINATION bin)
