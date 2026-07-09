@@ -5,11 +5,14 @@
 
 namespace bar::modules {
 
+class VolumeButton;
+
 class VolumeWindow : public Gtk::Popover {
 public:
     VolumeWindow();
     double get_volume() const;
     bool get_muted() const;
+    VolumeButton* volume_button = nullptr;
 
 private:
     Gtk::Scale *slider = nullptr;

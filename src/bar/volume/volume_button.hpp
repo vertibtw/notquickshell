@@ -6,6 +6,7 @@ namespace bar::modules {
     public:
         Gtk::Label* label = Gtk::make_managed<Gtk::Label>();
         VolumeButton(Gtk::Popover*);
+        void update_label(double volume, bool muted);
         ~VolumeButton() = default;
     };
 }

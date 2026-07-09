@@ -1,4 +1,5 @@
 #include "volume_window.hpp"
+#include "volume_button.hpp"
 #include "../wireplumber.hpp"
 namespace bar::modules {
 
@@ -32,13 +33,18 @@ VolumeWindow::VolumeWindow() {
         }
     });
 
+    // doesn't update the volume when the popup is closed, updating the icon in the bar live is still TODO
     signal_show().connect([this]() {
         if (!this->poll_conn.connected()) {
             this->poll_conn = Glib::signal_timeout().connect(
-                sigc::mem_fun(*this, &VolumeWindow::poll), 500);
+                sigc::mem_fun(*this, &VolumeWindow::poll), 200); // probably fine to do every 200ms
         }
+
         // initial poll
-        Glib::signal_idle().connect_once([this]() { poll(); });
+        Glib::signal_idle().connect_once([this]() { 
+            this->change_volume_button_label(wp::wpctl_get_volume());
+            this->poll(); 
+        });
     });
 
     signal_hide().connect([this]() {
@@ -50,7 +56,9 @@ VolumeWindow::VolumeWindow() {
 
 bool VolumeWindow::poll() {
     this->updating = true;
-    this->slider->set_value(wp::wpctl_get_volume() * 100.0);
+    double vol = wp::wpctl_get_volume() * 100.0;
+    this->slider->set_value(vol);
+    this->change_volume_button_label(vol);
     this->mute_btn->set_active(wp::wpctl_get_muted());
     this->updating = false;
     return true;
@@ -70,6 +78,9 @@ void VolumeWindow::change_volume_button_label (double volume) {
     else if (volume <= 33)  this->mute_btn->set_label("󰕿");
     else if (volume <= 66)  this->mute_btn->set_label("󰖀");
     else if (volume <= 100) this->mute_btn->set_label("󰕾");
+
+    if (this->volume_button)
+        this->volume_button->update_label(volume, this->get_muted());
 }
 
 }

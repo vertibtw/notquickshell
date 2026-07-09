@@ -139,7 +139,7 @@ namespace widgets {
         auto mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(this->ipc);
         auto mod_clock = Gtk::make_managed<bar::modules::Clock>();        
         auto mod_vol_btn = Gtk::make_managed<bar::modules::VolumeButton>(popover);
-
+        popover->volume_button = mod_vol_btn;
 
         c_box->append(*mod_workspaces);
         r_box->append(*mod_clock);

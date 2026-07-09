@@ -9,4 +9,12 @@ namespace bar::modules {
         this->add_css_class("volume_button");
         this->label->set_text("volume");
     }
+
+    void VolumeButton::update_label(double volume, bool muted) {
+        if (muted)          this->label->set_text("󰖁");
+        else if (volume <= 0)   this->label->set_text("󰝟");
+        else if (volume <= 33)  this->label->set_text("󰕿");
+        else if (volume <= 66)  this->label->set_text("󰖀");
+        else if (volume <= 100) this->label->set_text("󰕾");
+    }
 }
