@@ -33,7 +33,6 @@ VolumeWindow::VolumeWindow() {
         }
     });
 
-    // doesn't update the volume when the popup is closed, updating the icon in the bar live is still TODO
     signal_show().connect([this]() {
         if (!this->poll_conn.connected()) {
             this->poll_conn = Glib::signal_timeout().connect(
