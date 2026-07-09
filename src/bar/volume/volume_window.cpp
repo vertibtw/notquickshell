@@ -40,7 +40,6 @@ VolumeWindow::VolumeWindow() {
                 sigc::mem_fun(*this, &VolumeWindow::poll), 200); // probably fine to do every 200ms
         }
 
-        // initial poll
         Glib::signal_idle().connect_once([this]() { 
             this->change_volume_button_label(wp::wpctl_get_volume());
             this->poll(); 

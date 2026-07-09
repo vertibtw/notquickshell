@@ -8,5 +8,9 @@ namespace bar::modules {
         VolumeButton(Gtk::Popover*);
         void update_label(double volume, bool muted);
         ~VolumeButton() = default;
+
+    private:
+        sigc::connection poll_conn;
+        bool poll();
     };
 }
