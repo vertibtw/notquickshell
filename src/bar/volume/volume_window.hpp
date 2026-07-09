@@ -18,7 +18,7 @@ private:
     bool updating = false;
 
     bool poll();
-    void change_button_label (Gtk::ToggleButton*, double volume);
+    void change_volume_button_label (double);
 };
 
 }

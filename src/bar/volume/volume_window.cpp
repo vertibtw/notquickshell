@@ -7,34 +7,34 @@ VolumeWindow::VolumeWindow() {
     auto vbox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 4);
     vbox->set_margin(4);
 
-    slider = Gtk::make_managed<Gtk::Scale>(Gtk::Adjustment::create(50.0, 0.0, 100.0, 1.0, 10.0, 0.0));
-    slider->set_digits(0);
-    slider->set_draw_value(false);
-    slider->set_size_request(140, -1);
+    this->slider = Gtk::make_managed<Gtk::Scale>(Gtk::Adjustment::create(50.0, 0.0, 100.0, 1.0, 10.0, 0.0));
+    this->slider->set_digits(0);
+    this->slider->set_draw_value(false);
+    this->slider->set_size_request(140, -1);
 
-    mute_btn = Gtk::make_managed<Gtk::ToggleButton>("Mute");
+    this->mute_btn = Gtk::make_managed<Gtk::ToggleButton>("Mute");
     
-    vbox->append(*slider);
-    vbox->append(*mute_btn);
+    vbox->append(*this->slider);
+    vbox->append(*this->mute_btn);
     set_child(*vbox);
 
     slider->signal_value_changed().connect([this]() {
-        if (!updating) {
-            wp::wpctl_set_volume(slider->get_value());
-            this->change_button_label(this->mute_btn, slider->get_value());
+        if (!this->updating) {
+            wp::wpctl_set_volume(this->slider->get_value());
+            this->change_volume_button_label(this->slider->get_value());
         }
     });
 
     mute_btn->signal_toggled().connect([this]() {
         if (!updating) {
             wp::wpctl_set_muted(mute_btn->get_active());
-            this->change_button_label(this->mute_btn, slider->get_value());
+            this->change_volume_button_label(this->slider->get_value());
         }
     });
 
     signal_show().connect([this]() {
-        if (!poll_conn.connected()) {
-            poll_conn = Glib::signal_timeout().connect(
+        if (!this->poll_conn.connected()) {
+            this->poll_conn = Glib::signal_timeout().connect(
                 sigc::mem_fun(*this, &VolumeWindow::poll), 500);
         }
         // initial poll
@@ -50,25 +50,26 @@ VolumeWindow::VolumeWindow() {
 
 bool VolumeWindow::poll() {
     this->updating = true;
-    slider->set_value(wp::wpctl_get_volume() * 100.0);
-    mute_btn->set_active(wp::wpctl_get_muted());
-    updating = false;
+    this->slider->set_value(wp::wpctl_get_volume() * 100.0);
+    this->mute_btn->set_active(wp::wpctl_get_muted());
+    this->updating = false;
     return true;
 }
 
 double VolumeWindow::get_volume() const {
-    return slider->get_value();
+    return this->slider->get_value();
 }
 
 bool VolumeWindow::get_muted() const {
-    return mute_btn->get_active();
+    return this->mute_btn->get_active();
 }
 
-void VolumeWindow::change_button_label (Gtk::ToggleButton* btn, double volume) {
-    if      (volume <= 0)   btn->set_label("muted"); 
-    else if (volume <= 33)  btn->set_label("small sound");
-    else if (volume <= 66)  btn->set_label("medium sound");
-    else if (volume <= 100) btn->set_label("big sound");
+void VolumeWindow::change_volume_button_label (double volume) {
+    if (this->get_muted())  this->mute_btn->set_label("󰖁");
+    else if (volume <= 0)   this->mute_btn->set_label("󰝟"); 
+    else if (volume <= 33)  this->mute_btn->set_label("󰕿");
+    else if (volume <= 66)  this->mute_btn->set_label("󰖀");
+    else if (volume <= 100) this->mute_btn->set_label("󰕾");
 }
 
 }
