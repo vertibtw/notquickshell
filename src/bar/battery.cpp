@@ -18,14 +18,53 @@ namespace bar{
                 if (!(fc >> capacity)) return false;
                 this->percentage->set_text(std::to_string(capacity) + "%");
 
+                if (capacity > 30) {
+                    this->percentage->remove_css_class("low");
+                } else {
+                    this->percentage->add_css_class("low");
+                    Glib::spawn_command_line_async("notify-send --urgency critical battery low");
+                }
+
                 
                 std::string buffer = "";
                 if (!std::getline(fs, buffer)) return false;
-                if      (buffer == "Full")         this->st_icon->set_text("[f]");
-                else if (buffer == "Discharging")  this->st_icon->set_text("[d]");
-                else if (buffer == "Not charging") this->st_icon->set_text("[n]");
-                else if (buffer == "Charging")     this->st_icon->set_text("[c]");
-                else this->st_icon->set_text("[u]");
+                if (buffer == "Full") {
+                    this->st_icon->set_text("[f]");
+
+                    this->st_icon->remove_css_class("discharging");
+                    this->st_icon->remove_css_class("not_charging");
+                    this->st_icon->remove_css_class("charging");
+                    this->st_icon->remove_css_class("unknown");
+                    this->st_icon->add_css_class("full");
+                } else if (buffer == "Discharging") {
+                    this->st_icon->set_text("[d]");
+                    this->st_icon->remove_css_class("full");
+                    this->st_icon->remove_css_class("not_charging");
+                    this->st_icon->remove_css_class("charging");
+                    this->st_icon->remove_css_class("unknown");
+                    this->st_icon->add_css_class("discharging");
+                } else if (buffer == "Not charging") {
+                    this->st_icon->set_text("[n]");
+                    this->st_icon->remove_css_class("discharging");
+                    this->st_icon->remove_css_class("full");
+                    this->st_icon->remove_css_class("charging");
+                    this->st_icon->remove_css_class("unknown");
+                    this->st_icon->add_css_class("not_charging");
+                } else if (buffer == "Charging") {
+                    this->st_icon->set_text("[c]");
+                    this->st_icon->remove_css_class("discharging");
+                    this->st_icon->remove_css_class("not_charging");
+                    this->st_icon->remove_css_class("full");
+                    this->st_icon->remove_css_class("unknown");
+                    this->st_icon->add_css_class("charging");
+                } else {
+                    this->st_icon->set_text("[u]");
+                    this->st_icon->remove_css_class("discharging");
+                    this->st_icon->remove_css_class("not_charging");
+                    this->st_icon->remove_css_class("charging");
+                    this->st_icon->remove_css_class("full");
+                    this->st_icon->add_css_class("unknown");
+                }
 
                 return true;
             };
