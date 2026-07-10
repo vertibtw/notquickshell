@@ -36,7 +36,7 @@ namespace hyprland {
         while ((received = recv(s, buffer, sizeof(buffer) - 1, 0)) > 0) {
             buffer[received] = '\0';
             response.append(buffer, received); 
-            std::cout << buffer << "\n";
+            //std::cout << buffer << "\n";
         }
         if (received < 0) {
             std::cerr << "ERROR: recv failed: " << strerror(errno) << "\n";
@@ -75,8 +75,6 @@ namespace hyprland {
                 if (on_event) on_event(event, arg);
             }
         }
-
-        // close (s); // nobody needs this anyway
     }
 
     std::vector<Workspace*> Ipc::get_initial_workspaces () {

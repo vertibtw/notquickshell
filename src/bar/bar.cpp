@@ -136,27 +136,33 @@ namespace widgets {
         main_box->set_center_widget(*c_box);
         main_box->set_end_widget(*r_box);
 
-        auto mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(this->ipc);
-        auto mod_clock = Gtk::make_managed<bar::modules::Clock>();        
-        auto mod_vol_btn = Gtk::make_managed<bar::modules::VolumeButton>(popover);
-        popover->volume_button = mod_vol_btn;
+        this->mod_workspaces = Gtk::make_managed<bar::modules::Workspaces>(this->ipc);
+        this->mod_window_title = Gtk::make_managed<bar::modules::WindowTitle>(this->ipc);
+        this->mod_clock = Gtk::make_managed<bar::modules::Clock>();        
+        this->mod_battery = Gtk::make_managed<bar::modules::Battery>();
+        this->mod_vol_btn = Gtk::make_managed<bar::modules::VolumeButton>(popover);
+        popover->volume_button = this->mod_vol_btn;
 
-        c_box->append(*mod_workspaces);
-        r_box->append(*mod_clock);
-        r_box->append(*mod_vol_btn);
+        l_box->append(*this->mod_window_title);
+        c_box->append(*this->mod_workspaces);
+        r_box->append(*this->mod_vol_btn);
+        r_box->append(*this->mod_battery);
+        r_box->append(*this->mod_clock);
 
         // lambdas :<
-        ipc->on_event = [this, mod_workspaces] (std::string event, std::string arg) -> void {
-            Glib::signal_idle().connect_once([this, mod_workspaces, event, arg]()-> void {
+        ipc->on_event = [this] (std::string event, std::string arg) -> void {
+            Glib::signal_idle().connect_once([this, event, arg]()-> void {
                 if (event == "workspace") {
-                    int ws_id = std::stoi(arg); // this has to be here and repeated, because some args are not numerical
-                    mod_workspaces->change_active_ws(ws_id);
+                    int ws_id = std::stoi(arg);
+                    this->mod_workspaces->change_active_ws(ws_id);
                   } else if (event == "createworkspace") {
                     int ws_id = std::stoi(arg);
-                    mod_workspaces->create_ws(ws_id);
+                    this->mod_workspaces->create_ws(ws_id);
                   } else if (event == "destroyworkspace") {
                     int ws_id = std::stoi(arg);
-                    mod_workspaces->destroy_ws(ws_id);
+                    this->mod_workspaces->destroy_ws(ws_id);
+                  } else if (event == "activewindow") {
+                    this->mod_window_title->on_window_title_change(arg);
                   } else {
                     // std::cout << "ommited event: " << event << " >> " << arg << "\n";
                   }

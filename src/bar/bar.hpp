@@ -15,6 +15,8 @@
 #include "../util/is_int.hpp"
 #include "clock.hpp"
 #include "workspaces.hpp"
+#include "window_title.hpp"
+#include "battery.hpp"
 #include "volume/volume_button.hpp"
 #include "volume/volume_window.hpp"
 
@@ -25,6 +27,12 @@ namespace widgets {
         bool vertical = false;
         bool horizontal = false;
         std::shared_ptr<hyprland::Ipc> ipc;
+
+        bar::modules::Workspaces* mod_workspaces = nullptr;
+        bar::modules::WindowTitle* mod_window_title = nullptr;
+        bar::modules::Clock* mod_clock = nullptr;
+        bar::modules::Battery* mod_battery = nullptr;
+        bar::modules::VolumeButton* mod_vol_btn = nullptr;
 
         public:
         Bar (std::shared_ptr<ini>);

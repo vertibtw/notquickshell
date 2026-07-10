@@ -105,6 +105,10 @@ int main (int argc, char** argv) {
     "  min-width: 0;"
     "  min-height: 0;"
     "  opacity: 0;"
+    "}"
+    ".window_title label {"
+    "  color: var(--foreground_main);"
+//    "  background: linear-gradient(to right, var(--background_main) 80%, transparent 100%);"
     "}";
 
 
