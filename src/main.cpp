@@ -41,7 +41,7 @@ int main (int argc, char** argv) {
     "* {"
     "font-family: 'Scientifica';"
     "font-size: 15px;"
-//    "font-weight: bold;"
+    "font-weight: bold;"
     "}"
     ".bar {"
     "  background: var(--background_main);"
