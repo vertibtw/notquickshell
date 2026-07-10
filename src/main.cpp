@@ -109,6 +109,15 @@ int main (int argc, char** argv) {
     ".window_title label {"
     "  color: var(--foreground_main);"
 //    "  background: linear-gradient(to right, var(--background_main) 80%, transparent 100%);"
+    "}"
+    ".battery-bracket {"
+    "  color: var(--foreground_main);"
+    "}"
+    ".battery-icon {"
+    "  color: var(--foreground_main);"
+    "}"
+    ".battery label {"
+    "  color: var(--foreground_main);"
     "}";
 
 

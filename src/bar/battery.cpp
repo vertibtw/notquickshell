@@ -1,39 +1,38 @@
 #include "battery.hpp"
 
-namespace bar::modules {
-    Battery::Battery () {
-        this->add_css_class("battery");
-        this->label = Gtk::make_managed<Gtk::Label>();
-        this->append(*this->label);
+namespace bar{
+    namespace modules {
+        Battery::Battery () {
+            this->add_css_class("battery");
+            this->st_icon    = Gtk::make_managed<Gtk::Label>();
+            this->percentage = Gtk::make_managed<Gtk::Label>();
 
-        Gio::init();
-        this->proxy = Gio::DBus::Proxy::create_for_bus_sync(
-            Gio::DBus::BusType::SYSTEM,
-            "org.freedesktop.UPower",
-            "/org/freedesktop/UPower/devices/battery_BAT0",
-            "org.freedesktop.UPower.Device");
+            this->append(*this->st_icon);
+            this->append(*this->percentage);
+            
+            auto refresh = [this] () -> bool {
+                int capacity = -1;
 
-        this->proxy->signal_properties_changed().connect(
-            [this](const std::map<Glib::ustring, Glib::VariantBase>&, const std::vector<Glib::ustring>&) {
-                this->refresh();
-            });
+                std::ifstream fc ("/sys/class/power_supply/BAT0/capacity");
+                std::ifstream fs ("/sys/class/power_supply/BAT0/status");
+                if (!(fc >> capacity)) return false;
+                this->percentage->set_text(std::to_string(capacity) + "%");
 
-        this->refresh();
-    }
+                
+                std::string buffer = "";
+                if (!std::getline(fs, buffer)) return false;
+                if      (buffer == "Full")         this->st_icon->set_text("[f]");
+                else if (buffer == "Discharging")  this->st_icon->set_text("[d]");
+                else if (buffer == "Not charging") this->st_icon->set_text("[n]");
+                else if (buffer == "Charging")     this->st_icon->set_text("[c]");
+                else this->st_icon->set_text("[u]");
 
-    void Battery::refresh () {
-        Glib::VariantBase pct, state;
-        this->proxy->get_cached_property(pct, "Percentage");
-        this->proxy->get_cached_property(state, "State");
+                return true;
+            };
 
-        if (!pct.gobj()) return;
-
-        int percent = (int)Glib::VariantBase::cast_dynamic<Glib::Variant<double>>(pct).get();
-        bool charging = state.gobj() ? Glib::VariantBase::cast_dynamic<Glib::Variant<guint32>>(state).get() == 1 : false;
-
-        std::string text = std::to_string(percent) + "%";
-        if (charging) text += " [\uf431]";
-
-        this->label->set_text(text);
-    }
+            Glib::signal_timeout().connect([=] () -> bool {
+                return refresh();
+            }, 200);
+        }
+}
 }

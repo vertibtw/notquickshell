@@ -1,16 +1,15 @@
 #pragma once
+#include <iostream>
+#include <fstream>
 #include <gtkmm.h>
-#include <giomm.h>
 
 namespace bar::modules {
     class Battery : public Gtk::Box {
         private:
-        Glib::RefPtr<Gio::DBus::Proxy> proxy;
-        Gtk::Label* label;
-
-        void refresh();
+        Gtk::Label* st_icon;
+        Gtk::Label* percentage;
         public:
         Battery();
-        ~Battery() override = default;
+        ~Battery() = default;
     };
 }
