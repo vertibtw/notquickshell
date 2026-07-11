@@ -3,8 +3,8 @@
 
 namespace theme {
     const std::string catppuccin_mocha = R"(:root {
-    --background_main: #1e1e2e;
-    --background_secondary: #313244;
+    --background_main: #11111b;
+    --background_secondary: #1e1e2e;
     --foreground_main: #cdd6f4;
     --foreground_secondary: #7f849c;
     --red: #f38ba8;

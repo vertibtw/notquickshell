@@ -8,6 +8,7 @@ namespace widgets {
             return;
         }
         this->set_title("v.shell.bar");
+        gtk_layer_set_namespace(this->gobj(), "v.shell");
         this->set_default_size(67, 69);
         gtk_layer_init_for_window(this->gobj());
 
