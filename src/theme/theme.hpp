@@ -1,10 +1,12 @@
 #pragma once
 #include <string>
 
+// TODO: separate this into css files and shi
 namespace theme {
     const std::string catppuccin_mocha = R"(:root {
     --background_main: #11111bd9;
     --background_secondary: #1e1e2e;
+    --background_light: #313244;
     --foreground_main: #cdd6f4;
     --foreground_secondary: #7f849c;
     --red: #f38ba8;
@@ -17,6 +19,7 @@ namespace theme {
     const std::string catppuccin_macchiato = R"(:root {
     --background_main: #1e2030;
     --background_secondary: #24273a;
+    --background_light: ;
     --foreground_main: #cad3f5;
     --foreground_secondary: #8087a2;
     --red: #ed8796;
@@ -29,6 +32,7 @@ namespace theme {
     const std::string catppuccin_frappe = R"(:root {
     --background_main: #292c3c;
     --background_secondary: #303446;
+    --background_light: ;
     --foreground_main: #c6d0f5;
     --foreground_secondary: #838ba7;
     --red: #e78284;
@@ -41,6 +45,7 @@ namespace theme {
     const std::string catppuccin_latte = R"(:root {
     --background_main: #e6e9ef;
     --background_secondary: #eff1f5;
+    --background_light: ;
     --foreground_main: #4c4f69;
     --foreground_secondary: #8c8fa1;
     --red: #d20f39;

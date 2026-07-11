@@ -57,7 +57,7 @@ int main (int argc, char** argv) {
     "  min-width: 20px;"
     "  min-height: 4px;"
 //    "  border-radius: 2px;"
-    "  background: var(--background_secondary); margin: 0 2px;"
+    "  background: var(--background_light); margin: 0 2px;"
     "  transition: background 200ms ease, min-width 200ms ease, min-height 200ms ease;"
     "}"
     ".workspace.occupied { background: var(--foreground_secondary); }"
