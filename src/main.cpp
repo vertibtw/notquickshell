@@ -45,6 +45,7 @@ int main (int argc, char** argv) {
     "}"
     ".bar {"
     "  background: var(--background_main);"
+    "  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);"
     "}"
     ".left-box {"
     "  margin-left: 10px;"
