@@ -116,6 +116,11 @@ namespace widgets {
         auto l_box = Gtk::make_managed<Gtk::Box>();
         auto c_box = Gtk::make_managed<Gtk::Box>();
         auto r_box = Gtk::make_managed<Gtk::Box>();
+
+        // TODO: spacing from the config
+        l_box->set_spacing(6);
+        c_box->set_spacing(6);
+        r_box->set_spacing(6);
         
         if ((*conf).contains("bar", "spacing")) {
             int spacing = std::stoi((*conf)["bar"]["spacing"]);
