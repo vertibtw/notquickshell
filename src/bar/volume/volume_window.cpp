@@ -1,10 +1,11 @@
 #include "volume_window.hpp"
-#include "volume_button.hpp"
 #include "../wireplumber.hpp"
+#include "volume_button.hpp"
 namespace bar::modules {
 
 VolumeWindow::VolumeWindow() {
-    // TODO: don't accentally forget that this is always supposed to be horizontal when u finally get to the part where you make the vertical bar work
+    // TODO: don't accentally forget that this is always supposed to be horizontal when u finally get to the part where
+    // you make the vertical bar work
     auto vbox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 4);
     vbox->set_margin(4);
 
@@ -14,7 +15,7 @@ VolumeWindow::VolumeWindow() {
     this->slider->set_size_request(140, -1);
 
     this->mute_btn = Gtk::make_managed<Gtk::ToggleButton>("Mute");
-    
+
     vbox->append(*this->slider);
     vbox->append(*this->mute_btn);
     set_child(*vbox);
@@ -35,19 +36,17 @@ VolumeWindow::VolumeWindow() {
 
     signal_show().connect([this]() {
         if (!this->poll_conn.connected()) {
-            this->poll_conn = Glib::signal_timeout().connect(
-                sigc::mem_fun(*this, &VolumeWindow::poll), 200); // probably fine to do every 200ms
+            this->poll_conn = Glib::signal_timeout().connect(sigc::mem_fun(*this, &VolumeWindow::poll),
+                                                             200); // probably fine to do every 200ms
         }
 
-        Glib::signal_idle().connect_once([this]() { 
+        Glib::signal_idle().connect_once([this]() {
             this->change_volume_button_label(wp::wpctl_get_volume());
-            this->poll(); 
+            this->poll();
         });
     });
 
-    signal_hide().connect([this]() {
-        poll_conn.disconnect();
-    });
+    signal_hide().connect([this]() { poll_conn.disconnect(); });
 
     this->add_css_class("volume_window");
 }
@@ -70,15 +69,20 @@ bool VolumeWindow::get_muted() const {
     return this->mute_btn->get_active();
 }
 
-void VolumeWindow::change_volume_button_label (double volume) {
-    if (this->get_muted())  this->mute_btn->set_label("󰖁");
-    else if (volume <= 0)   this->mute_btn->set_label("󰝟"); 
-    else if (volume <= 33)  this->mute_btn->set_label("󰕿");
-    else if (volume <= 66)  this->mute_btn->set_label("󰖀");
-    else if (volume <= 100) this->mute_btn->set_label("󰕾");
+void VolumeWindow::change_volume_button_label(double volume) {
+    if (this->get_muted())
+        this->mute_btn->set_label("󰖁");
+    else if (volume <= 0)
+        this->mute_btn->set_label("󰝟");
+    else if (volume <= 33)
+        this->mute_btn->set_label("󰕿");
+    else if (volume <= 66)
+        this->mute_btn->set_label("󰖀");
+    else if (volume <= 100)
+        this->mute_btn->set_label("󰕾");
 
     if (this->volume_button)
         this->volume_button->update_label(volume, this->get_muted());
 }
 
-}
+} // namespace bar::modules

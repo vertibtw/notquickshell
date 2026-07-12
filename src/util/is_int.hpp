@@ -3,5 +3,5 @@
 #include <string>
 
 namespace util {
-    bool is_number(std::string value);
+bool is_number(std::string value);
 }

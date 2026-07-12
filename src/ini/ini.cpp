@@ -1,31 +1,30 @@
 #include "ini.hpp"
 
-#define NEXT(i, bs, errormsg) \
-    do { \
-        if ((i) >= (bs)) { \
-            std::cerr << "ERROR: " << errormsg << "\n"; \
-            std::exit(1); \
-        } \
-        (i)++; \
+#define NEXT(i, bs, errormsg)                                                                                          \
+    do {                                                                                                               \
+        if ((i) >= (bs)) {                                                                                             \
+            std::cerr << "ERROR: " << errormsg << "\n";                                                                \
+            std::exit(1);                                                                                              \
+        }                                                                                                              \
+        (i)++;                                                                                                         \
     } while (0)
 
-
 namespace {
-    std::string trim(const std::string& s) {
-       size_t start = 0;
-       size_t end = s.size();
+std::string trim(const std::string &s) {
+    size_t start = 0;
+    size_t end = s.size();
 
-       while (start < end && isspace(s[start]))
-           start++;
+    while (start < end && isspace(s[start]))
+        start++;
 
-       while (end > start && isspace(s[end - 1]))
-           end--;
+    while (end > start && isspace(s[end - 1]))
+        end--;
 
-       return s.substr(start, end - start);
-    }
+    return s.substr(start, end - start);
 }
+} // namespace
 
-ini ini::parse (std::string content) {
+ini ini::parse(std::string content) {
     ini r;
     std::istringstream c(content);
     std::string buffer, section, key = "";
@@ -35,10 +34,12 @@ ini ini::parse (std::string content) {
         line_count++;
         int64_t bs = buffer.size();
         for (int64_t i = 0; i < bs; i++) {
-            if (std::isspace(buffer[i])) continue;
-            else if (buffer[i] == '#' || buffer[i] == ';') break;
+            if (std::isspace(buffer[i]))
+                continue;
+            else if (buffer[i] == '#' || buffer[i] == ';')
+                break;
             else if (buffer[i] == '[') {
-                
+
                 std::string errormsg = "no closing '] line (" + std::to_string(line_count) + ")";
                 section.clear();
                 NEXT(i, bs, errormsg);
@@ -65,10 +66,10 @@ ini ini::parse (std::string content) {
 
                 if (key == "") {
                     std::cerr << "ERROR: " << errormsg << " (line " << line_count << ")\n";
-                    std::exit (1);
+                    std::exit(1);
                 }
 
-                i--; // so that we also parse the = 
+                i--; // so that we also parse the =
             } else if (buffer[i] == '=') {
 
                 std::string errormsg = "no value for key" + key;
@@ -84,13 +85,12 @@ ini ini::parse (std::string content) {
 
                 r.conf[section][key] = value;
                 key.clear();
-                
+
                 break;
             } else {
 
                 std::cerr << "ERROR: unexpected EOF, on line " << line_count << "\n";
                 std::exit(1);
-
             }
         }
     }

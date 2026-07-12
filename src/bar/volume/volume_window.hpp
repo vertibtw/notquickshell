@@ -8,20 +8,20 @@ namespace bar::modules {
 class VolumeButton;
 
 class VolumeWindow : public Gtk::Popover {
-public:
+    public:
     VolumeWindow();
     double get_volume() const;
     bool get_muted() const;
-    VolumeButton* volume_button = nullptr;
+    VolumeButton *volume_button = nullptr;
 
-private:
+    private:
     Gtk::Scale *slider = nullptr;
     Gtk::ToggleButton *mute_btn = nullptr;
     sigc::connection poll_conn;
     bool updating = false;
 
     bool poll();
-    void change_volume_button_label (double);
+    void change_volume_button_label(double);
 };
 
-}
+} // namespace bar::modules

@@ -3,7 +3,7 @@
 
 // TODO: separate this into css files and shi
 namespace theme {
-    const std::string catppuccin_mocha = R"(:root {
+const std::string catppuccin_mocha = R"(:root {
     --background_main: #11111bd9;
     --background_secondary: #1e1e2e;
     --background_light: #313244;
@@ -15,8 +15,8 @@ namespace theme {
     --blue: #89b4fa;
     --purple: #cba6f7;
 })";
-    
-    const std::string catppuccin_macchiato = R"(:root {
+
+const std::string catppuccin_macchiato = R"(:root {
     --background_main: #1e2030;
     --background_secondary: #24273a;
     --background_light: ;
@@ -28,8 +28,8 @@ namespace theme {
     --blue: #8aadf4;
     --purple: #c6a0f6
 })";
-    
-    const std::string catppuccin_frappe = R"(:root {
+
+const std::string catppuccin_frappe = R"(:root {
     --background_main: #292c3c;
     --background_secondary: #303446;
     --background_light: ;
@@ -41,8 +41,8 @@ namespace theme {
     --blue: #8caaee;
     --purple: #ca9ee6
 })";
-    
-    const std::string catppuccin_latte = R"(:root {
+
+const std::string catppuccin_latte = R"(:root {
     --background_main: #e6e9ef;
     --background_secondary: #eff1f5;
     --background_light: ;
@@ -54,4 +54,4 @@ namespace theme {
     --blue: #1e66f5;
     --purple: #8839ef
 })";
-}
+} // namespace theme
