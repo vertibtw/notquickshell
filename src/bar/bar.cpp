@@ -169,7 +169,7 @@ Bar::Bar(std::shared_ptr<ini> conf) {
             } else if (event == "activewindow") {
                 this->mod_window_title->on_window_title_change(arg);
             } else {
-                // std::cout << "ommited event: " << event << " >> " << arg << "\n";
+                std::cout << "ommited event: " << event << " >> " << arg << "\n";
             }
         });
     };
