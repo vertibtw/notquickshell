@@ -4,9 +4,15 @@ namespace hyprland {
 Ipc::Ipc() {
     this->his = std::getenv("HYPRLAND_INSTANCE_SIGNATURE");
     this->runtimedir = std::getenv("XDG_RUNTIME_DIR");
-    // I wanted to use this-> instead of Ipc:: here but c++ is developed by stupid fucking people and we can't have nice
-    // things
-    std::thread(&Ipc::socket2, this).detach();
+    this->event_thread = std::thread(&Ipc::socket2, this);
+}
+
+Ipc::~Ipc() {
+    this->running = false;
+    if (this->s2 >= 0)
+        close(this->s2);
+    if (this->event_thread.joinable())
+        this->event_thread.join();
 }
 
 std::string Ipc::socket1(std::string cmd) {
@@ -49,20 +55,20 @@ std::string Ipc::socket1(std::string cmd) {
 void Ipc::socket2() {
     std::string socket_path = this->runtimedir + "/hypr/" + this->his + "/.socket2.sock";
 
-    int s = socket(AF_UNIX, SOCK_STREAM, 0);
+    this->s2 = socket(AF_UNIX, SOCK_STREAM, 0);
 
     struct sockaddr_un addr;
     addr.sun_family = AF_UNIX;
     strcpy(addr.sun_path, socket_path.c_str());
 
-    if (connect(s, (sockaddr *)&addr, sizeof(addr)) < 0) {
+    if (connect(this->s2, (sockaddr *)&addr, sizeof(addr)) < 0) {
         std::cerr << "ERROR: couldn't connect to hyprland's ipc.\n";
         std::exit(3);
     }
 
     char buf[4096];
-    while (true) {
-        ssize_t n = read(s, buf, sizeof(buf) - 1);
+    while (this->running) {
+        ssize_t n = read(this->s2, buf, sizeof(buf) - 1);
         if (n <= 0)
             break;
         buf[n] = '\0';

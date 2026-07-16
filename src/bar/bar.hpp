@@ -11,7 +11,6 @@
 
 #include "../ini/ini.hpp"
 #include "../ipc/hyprland/ipc.hpp"
-#include "../theme/theme.hpp"
 #include "../util/is_int.hpp"
 #include "battery.hpp"
 #include "clock.hpp"
