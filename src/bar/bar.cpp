@@ -32,8 +32,8 @@ Bar::Bar(std::shared_ptr<ini> conf) {
 
     // TODO: find a cleaner way to do this maybe
     if (!(*conf).contains("bar", "position")) {
-        std::cerr << "WARN: no bar position or an invalid one provided, using default (top)\n";
-        goto top; // uh yes
+        std::cerr << "WARN: no bar position provided, using default (top)\n"; // uh yes
+        goto top;
     } else if ((*conf)["bar"]["position"] == "top") {
     top:
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_LEFT, true);
@@ -59,6 +59,9 @@ Bar::Bar(std::shared_ptr<ini> conf) {
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_TOP, true);
         gtk_layer_set_anchor(this->gobj(), GTK_LAYER_SHELL_EDGE_BOTTOM, true);
         this->vertical = true;
+    } else {
+        std::cerr << "WARN: invalid bar position ('" << (*conf)["bar"]["position"] << "'), using default (top)\n";
+        goto top;
     }
     /*
     **********************************
@@ -169,7 +172,7 @@ Bar::Bar(std::shared_ptr<ini> conf) {
             } else if (event == "activewindow") {
                 this->mod_window_title->on_window_title_change(arg);
             } else {
-                std::cout << "ommited event: " << event << " >> " << arg << "\n";
+                // std::cout << "ommited event: " << event << " >> " << arg << "\n";
             }
         });
     };
